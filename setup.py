@@ -6,9 +6,7 @@ setup(
     packages=find_packages(where="src"),
     package_dir={"": "src"},
     install_requires=[],
-    extras_require={
-        "dev": ["pytest", "flake8", "black", "mypy"]
-    },
+    extras_require={"dev": ["pytest", "flake8", "black", "mypy"]},
     author="guilhermefiorot",
     author_email="guilhermefirme3@gmail.com",
     description="Um conversor de números inteiros para algarismos romanos",
