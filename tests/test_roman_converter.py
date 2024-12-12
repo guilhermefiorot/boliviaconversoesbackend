@@ -3,7 +3,7 @@ import sys
 import unittest
 
 # Adicionar o diretório src ao path ANTES de importar
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 from src.roman_converter import int_to_roman
 
