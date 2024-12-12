@@ -1,0 +1,115 @@
+name: Python CI/CD
+
+# Dispara o workflow em push e pull requests para branches principais
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  # Job de testes
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.8, 3.9, 3.10, 3.11]
+
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Configurar Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v3
+      with:
+        python-version: ${{ matrix.python-version }}
+    
+    - name: Instalar dependências
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install pytest
+    
+    - name: Executar testes
+      run: |
+        pytest tests/test_roman_converter.py
+
+  # Job de análise de código
+  code-quality:
+    runs-on: ubuntu-latest
+    needs: test
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Configurar Python
+      uses: actions/setup-python@v3
+      with:
+        python-version: 3.11
+    
+    - name: Instalar ferramentas de qualidade
+      run: |
+        pip install flake8 black mypy
+    
+    - name: Verificar formatação com Black
+      run: |
+        black --check .
+    
+    - name: Análise estática com Flake8
+      run: |
+        flake8 .
+    
+    - name: Verificação de tipos com MyPy
+      run: |
+        mypy src/
+
+  # Job de release (CD)
+  release:
+    needs: [test, code-quality]
+    runs-on: ubuntu-latest
+    # Só roda em push para main/master
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Configurar Python
+      uses: actions/setup-python@v3
+      with:
+        python-version: 3.11
+    
+    - name: Gerar pacote
+      run: |
+        pip install setuptools wheel
+        python setup.py sdist bdist_wheel
+    
+    - name: Criar Release
+      uses: softprops/action-gh-release@v1
+      if: startsWith(github.ref, 'refs/tags/')
+      with:
+        files: |
+          dist/*.whl
+          dist/*.tar.gz
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  # Job de documentação (opcional)
+  docs:
+    runs-on: ubuntu-latest
+    needs: [test, code-quality]
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Configurar Python
+      uses: actions/setup-python@v3
+      with:
+        python-version: 3.11
+    
+    - name: Instalar dependências de documentação
+      run: |
+        pip install sphinx
+    
+    - name: Gerar documentação
+      run: |
+        cd docs
+        make html
