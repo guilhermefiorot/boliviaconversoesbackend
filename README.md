@@ -6,7 +6,7 @@
 Uma implementação em Python para conversão de números inteiros para algarismos romanos, desenvolvida utilizando Desenvolvimento Orientado a Testes (TDD).
 
 ## Requisitos
-- Python 3.8+
+- Python 3.12
 - pytest (instalável via requirements.txt)
 
 ## Instalação
