@@ -1,9 +1,9 @@
-import unittest
-import sys
 import os
+import sys
+import unittest
 
-# Adiciona o diretório src ao path para importação
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+# Adicionar o diretório src ao path ANTES de importar
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from src.roman_converter import int_to_roman
 
